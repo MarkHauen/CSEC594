@@ -43,7 +43,7 @@ for entry in getDataLines():
         if BCDRAnswers[i] == getCorrectAnswers().split(",")[i + 10]:
             BCDRScore = BCDRScore + 1
     x = "|".join([str(CryptoScore), str(BCDRScore)] + Demographics)
-
+    print(x)
     newData.append(x)
 
 

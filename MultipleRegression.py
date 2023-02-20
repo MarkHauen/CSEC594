@@ -1,29 +1,53 @@
-import pandas as pd
+import csv
 import statsmodels.api as sm
-from DataCleaner import getDataPath
+import numpy as np
 
 # Load the data from the CSV file
-data = pd.read_csv(getDataPath('SurveyDataScored'), sep='|')
+with open('SurveyDataScored.csv') as f:
+    data = [row for row in csv.DictReader(f, delimiter='|')]
 
-# Convert the categorical variables to dummy variables
-#data = pd.get_dummies(data, columns=['Group', 'Gender', 'Education', 'Cryptography_Exp', 'BCDR_Exp'])
-for x in ['Group', 'Gender', 'Education', 'Cryptography_Exp', 'BCDR_Exp']:
-    data[x] = data[x].astype('category')
+# Convert the Cryptography_Score and BCDR_Score columns to numeric types
+for row in data:
+    row['Cryptography_Score'] = int(row['Cryptography_Score'])
+    row['BCDR_Score'] = int(row['BCDR_Score'])
 
-data["Cryptography_Score"] = data["Cryptography_Score"].astype('int64')
-#data["BCDR_Score"] = data["BCDR_Score"].astype('int64')
+# Create dummy variables for the categorical variables
+gender_dummy = []
+education_dummy = []
+crypto_exp_dummy = []
+bcdr_exp_dummy = []
+for row in data:
+    gender = row['Gender']
+    education = row['Education']
+    crypto_exp = row['Cryptography_Exp']
+    bcdr_exp = row['BCDR_Exp']
+    gender_dummy.append(1 if gender == 'Male' else 0)
+    education_dummy.append(1 if education == 'Bachelor' else 0)
+    crypto_exp_dummy.append(1 if crypto_exp == 'Yes' else 0)
+    bcdr_exp_dummy.append(1 if bcdr_exp == 'Yes' else 0)
 
-# Separate the outcome variables from the predictor variables
-predictors = data.drop(['Cryptography_Score', 'BCDR_Score'], axis=1)
-cryptography_outcome = data['Cryptography_Score']
-bcdr_outcome = data['BCDR_Score']
+# Set up the design matrix
+design_matrix = []
+for i, row in enumerate(data):
+    design_matrix.append([
+        gender_dummy[i],
+        education_dummy[i],
+        crypto_exp_dummy[i],
+        bcdr_exp_dummy[i],
+        row['Cryptography_Score'],
+        row['BCDR_Score']
+    ])
 
-# Fit a multiple regression model for the Cryptography_Score outcome
-cryptography_model = sm.OLS(cryptography_outcome, predictors).fit()
+# Convert the design matrix to a numpy array
+design_matrix = np.array(design_matrix)
 
+# Set up the regression model
+X = design_matrix[:, :-2]
+Y = design_matrix[:, -2:]
+X = sm.add_constant(X)
+model = sm.OLS(Y, X)
 
-# Fit a multiple regression model for the BCDR_Score outcome
-bcdr_model = sm.OLS(bcdr_outcome, predictors).fit()
+# Fit the model and print the summary
+results = model.fit()
 
-print(cryptography_model.summary())
-print(bcdr_model.summary())
+print(results.summary())

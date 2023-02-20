@@ -30,16 +30,6 @@ crypto_t, crypto_p = ttest_ind(group_a_crypto, group_b_crypto)
 # Perform a two-sample t-test on the BCDR_Score column
 bcdr_t, bcdr_p = ttest_ind(group_a_bcdr, group_b_bcdr)
 
-# Print the results
-print(f'Group A (Chat GTP for BCDR) Average Score:\n  Cryptography: {Ave(group_a_crypto)}\n  BCDR: {Ave(group_a_bcdr)}\n'
-      f'Group B (Chat GTP for Cryptography) Average Score:\n  Cryptography: {Ave(group_b_crypto)}\n  BCDR: {Ave(group_b_bcdr)}\n')
-print('Cryptography Score t-value:', crypto_t)
-print('Cryptography Score p-value:', crypto_p)
-print('BCDR Score t-value:', bcdr_t)
-print('BCDR Score p-value:', bcdr_p)
-print(f'\nGroup A Equal Variances Test:{t_test_equal_variances(group_a_crypto, group_a_bcdr)}')
-print(f'Group B Equal Variances Test:{t_test_equal_variances(group_b_crypto, group_b_bcdr)}\n')
-
 # Perform Welch's t-test on the Cryptography_Score column
 crypto_t, crypto_p = ttest_ind(group_a_crypto, group_b_crypto, equal_var=False)
 
@@ -47,7 +37,15 @@ crypto_t, crypto_p = ttest_ind(group_a_crypto, group_b_crypto, equal_var=False)
 bcdr_t, bcdr_p = ttest_ind(group_a_bcdr, group_b_bcdr, equal_var=False)
 
 # Print the results
-print('Cryptography Score Welch\'s t-value:', crypto_t)
-print('Cryptography Score Welch\'s p-value:', crypto_p)
-print('BCDR Score Welch\'s t-value:', bcdr_t)
-print('BCDR Score Welch\'s p-value:', bcdr_p)
+print(f'Group A (Chat GTP for BCDR) Average Score:\n  Cryptography: {Ave(group_a_crypto)}\n  BCDR: {Ave(group_a_bcdr)}\n'
+      f'Group B (Chat GTP for Cryptography) Average Score:\n  Cryptography: {Ave(group_b_crypto)}\n  BCDR: {Ave(group_b_bcdr)}\n')
+print(f'Cryptography Score t-value: {crypto_t}')
+print(f'Cryptography Score p-value: {crypto_p}')
+print(f'BCDR Score t-value: {bcdr_t}')
+print(f'BCDR Score p-value: {bcdr_p}\n')
+print(f'Group A Equal Variances Test: {t_test_equal_variances(group_a_crypto, group_a_bcdr)}')
+print(f'Group B Equal Variances Test: {t_test_equal_variances(group_b_crypto, group_b_bcdr)}\n')
+print(f'Cryptography Score Welch\'s t-value: {crypto_t}')
+print(f'Cryptography Score Welch\'s p-value: {crypto_p}')
+print(f'BCDR Score Welch\'s t-value: {bcdr_t}')
+print(f'BCDR Score Welch\'s p-value: {bcdr_p}')
