@@ -1,30 +1,17 @@
-from os import path
+from ioTools import getDataLines, getCorrectAnswers,writeDataLines
 
-dataFileName = "SurveyDataTrimed"
-finalHeaders = "Cryptography_Score|BCDR_Score|Group|Gender|Education|Cryptography_Exp|BCDR_Exp"
-
-def getRoot():
-    return path.dirname(path.realpath(__file__))
-
-def getDataPath(fileName):
-    return "{r}\\{fn}.csv".format(r=getRoot(), fn=fileName)
-
-def getFileLines(fileName):
-    with open(getDataPath(fileName), mode='rt') as reader:
-        return reader.readlines()
-
-def getCorrectAnswers():
-    return getFileLines(dataFileName)[1]
-
-def getDataLines():
-    return getFileLines(dataFileName)[2:]
-
-def writeDataLines(fileName, dataLines):
-    with open("{r}\\{fn}.csv".format(r=getRoot(), fn=fileName), mode='wt') as writer:
-        writer.write("{h}\n{dl}".format(h=finalHeaders, dl=dataLines))
+def getPercent(lst, n):
+    return ",".join(['%' + str(int(round(100 * round((x/n), 2), 0))) for x in lst])
 
 newData = []
-
+cryptoQuestionsCorrectAnswers = [0 for x in range(10)]
+bcdrQuestionsCorrectAnswers = [0 for x in range(10)]
+cryptoQuestionsCorrectAnswersA = [0 for x in range(10)]
+bcdrQuestionsCorrectAnswersA = [0 for x in range(10)]
+cryptoQuestionsCorrectAnswersB = [0 for x in range(10)]
+bcdrQuestionsCorrectAnswersB = [0 for x in range(10)]
+badCryptoAnswers = []
+badBCDRAnswers = []
 for entry in getDataLines():
     data = entry.split(",")
     CryptoAnswers = data[:10]
@@ -39,13 +26,36 @@ for entry in getDataLines():
     for i in range(len(CryptoAnswers)):
         if CryptoAnswers[i] == getCorrectAnswers().split(",")[i]:
             CryptoScore = CryptoScore + 1
+            cryptoQuestionsCorrectAnswers[i] = cryptoQuestionsCorrectAnswers[i] + 1
+            if Demographics[0] == '1':
+                cryptoQuestionsCorrectAnswersA[i] = cryptoQuestionsCorrectAnswersA[i] + 1
+            else:
+                cryptoQuestionsCorrectAnswersB[i] = cryptoQuestionsCorrectAnswersB[i] + 1
     for i in range(len(BCDRAnswers)):
         if BCDRAnswers[i] == getCorrectAnswers().split(",")[i + 10]:
             BCDRScore = BCDRScore + 1
-    x = "|".join([str(CryptoScore), str(BCDRScore)] + Demographics)
-    print(x)
-    newData.append(x)
+            bcdrQuestionsCorrectAnswers[i] = bcdrQuestionsCorrectAnswers[i] + 1
+            if Demographics[0] == '1':
+                bcdrQuestionsCorrectAnswersA[i] = bcdrQuestionsCorrectAnswersA[i] + 1
+            else:
+                bcdrQuestionsCorrectAnswersB[i] = bcdrQuestionsCorrectAnswersB[i] + 1
+    newData.append("|".join([str(CryptoScore), str(BCDRScore)] + Demographics))
 
+for x in newData:
+    if x.split("|")[2] == '1':
+        print(x.replace("|", " & ").replace("_", "").replace("Training/Experience ", "").replace("School ", "").replace("Degree ", "").strip() + " \\\\")
+for x in newData:
+    if x.split("|")[2] == '2':
+        print(x.replace("|", " & ").replace("_", "").replace("Training/Experience ", "").replace("School ", "").replace("Degree ", "").strip() + " \\\\")
+
+print(f'Overall Cryptography: {getPercent(cryptoQuestionsCorrectAnswers, 26)}')
+print(f'Overall BCDR: {getPercent(bcdrQuestionsCorrectAnswers, 26)}')
+
+print(f'Group 1 Cryptography: {getPercent(cryptoQuestionsCorrectAnswersA, 11)}')
+print(f'Group 1 BCDR: {getPercent(bcdrQuestionsCorrectAnswersA, 11)}')
+
+print(f'Group 2 Cryptography: {getPercent(cryptoQuestionsCorrectAnswersB, 15)}')
+print(f'Group 2 BCDR: {getPercent(bcdrQuestionsCorrectAnswersB, 15)}')
 
 writeDataLines("SurveyDataScored", "\n".join(newData))
 
