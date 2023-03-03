@@ -1,53 +1,22 @@
-import csv
-import statsmodels.api as sm
 import numpy as np
+from DataCleaner import Data
+from T_Test import T_TestOutput
 
-# Load the data from the CSV file
-with open('SurveyDataScored.csv') as f:
-    data = [row for row in csv.DictReader(f, delimiter='|')]
+def formatCoefficients(coefficients):
+    colums = ['\n   learning_group', 'age', 'gender', 'education', 'cryptography_exp', 'BCDR_exp']
+    return '\n'.join([f'   {colums[x]}: {round(coefficients[x], 4)}' for x in range(5)])
 
-# Convert the Cryptography_Score and BCDR_Score columns to numeric types
-for row in data:
-    row['Cryptography_Score'] = int(row['Cryptography_Score'])
-    row['BCDR_Score'] = int(row['BCDR_Score'])
+# stack the input variables into a single 2D array
+X = np.column_stack((Data['learning_group'], Data['age'], Data['gender'], Data['education'], Data['cryptography_exp'], Data['BCDR_exp']))
 
-# Create dummy variables for the categorical variables
-gender_dummy = []
-education_dummy = []
-crypto_exp_dummy = []
-bcdr_exp_dummy = []
-for row in data:
-    gender = row['Gender']
-    education = row['Education']
-    crypto_exp = row['Cryptography_Exp']
-    bcdr_exp = row['BCDR_Exp']
-    gender_dummy.append(1 if gender == 'Male' else 0)
-    education_dummy.append(1 if education == 'Bachelor' else 0)
-    crypto_exp_dummy.append(1 if crypto_exp == 'Yes' else 0)
-    bcdr_exp_dummy.append(1 if bcdr_exp == 'Yes' else 0)
+# define the output variable as a list
+y = Data['exam1']
+yy = Data['exam2']
 
-# Set up the design matrix
-design_matrix = []
-for i, row in enumerate(data):
-    design_matrix.append([
-        gender_dummy[i],
-        education_dummy[i],
-        crypto_exp_dummy[i],
-        bcdr_exp_dummy[i],
-        row['Cryptography_Score'],
-        row['BCDR_Score']
-    ])
+# calculate the multiple regression coefficients
+coefficients = np.linalg.lstsq(X, y, rcond=None)[0]
+coefficients2 = np.linalg.lstsq(X, yy, rcond=None)[0]
 
-# Convert the design matrix to a numpy array
-design_matrix = np.array(design_matrix)
-
-# Set up the regression model
-X = design_matrix[:, :-2]
-Y = design_matrix[:, -2:]
-X = sm.add_constant(X)
-model = sm.OLS(Y, X)
-
-# Fit the model and print the summary
-results = model.fit()
-
-print(results.summary())
+All_OutPut = Data['output'] + T_TestOutput + \
+             f'Coefficients For Exam 1: {formatCoefficients(coefficients)}\n\n' \
+             f'Coefficients For Exam 2: {formatCoefficients(coefficients)}'

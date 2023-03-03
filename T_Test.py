@@ -26,9 +26,9 @@ crypto_t, crypto_p = ttest_ind(group_a_crypto, group_b_crypto)
 # Perform a two-sample t-test on the BCDR_Score column
 bcdr_t, bcdr_p = ttest_ind(group_a_bcdr, group_b_bcdr)
 
-# Print the results
-print(f'Cryptography Score t-value: {round(crypto_t, 2)}')
-print(f'Cryptography Score p-value: {round(crypto_p, 2)}')
-print(f'BCDR Score t-value: {round(bcdr_t, 2)}')
-print(f'BCDR Score p-value: {round(bcdr_p, 2)}\n')
+T_TestOutput = '\n\n2 sided T-Test output:\n' + \
+f'   Cryptography Score t-value: {round(crypto_t, 2)}\n' + \
+f'   Cryptography Score p-value: {round(crypto_p, 2)}\n' + \
+f'   BCDR Score t-value: {round(bcdr_t, 2)}\n' + \
+f'   BCDR Score p-value: {round(bcdr_p, 2)}\n\n'
 
