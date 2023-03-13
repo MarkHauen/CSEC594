@@ -1,6 +1,6 @@
 from ioTools import getDataLines, getCorrectAnswers, writeDataLines
 
-def getPercent(lst, n):  # Return a a list of numbers as string of percentages
+def getPercent(lst, n):  # Return a list of numbers as string of percentages
     return ",".join(['%' + str(int(round(100 * round((x / n), 2), 0))) for x in lst])
 
 # Dictionary to hold data for each participant
